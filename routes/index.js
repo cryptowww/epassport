@@ -8,7 +8,7 @@ var isAuthenticated = function (req,res,next) {
 
 /* GET home page. */
 router.get('/', isAuthenticated , function(req, res, next) {
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Home Page' });
 });
 
 module.exports = router;

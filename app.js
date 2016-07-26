@@ -36,6 +36,16 @@ passport.use('local', new LocalStrategy(
     }
 ));
 
+// enable github strategy
+GithubStrategy = require('passport-github').Strategy;
+passport.use(new GithubStrategy({//the key you applied from github
+    clientID: "a558ce27a352433104df",
+    clientSecret: "2e588646ad13f47b74xxx049f3b",
+    callbackURL: "http://localhost:3000/auth/github/callback"
+},function(accessToken, refreshToken, profile, done) {
+    done(null, profile);
+}));
+
 passport.serializeUser(function(user,done){
   done(null,user.username);
 });
@@ -48,6 +58,7 @@ var routes = require('./routes/index');
 var users = require('./routes/users');
 var logins = require('./routes/login');
 var logout = require('./routes/logout');
+var github = require('./routes/github');
 
 
 
@@ -66,7 +77,18 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 app.use('/login', logins);
-app.use('/logout',logout)
+app.use('/logout',logout);
+
+// github login enable
+app.use('/github',github.Github);
+app.get("/auth/github", passport.authenticate("github",{ scope : "email"}));
+
+app.get('/auth/github/callback', 
+  passport.authenticate('github', { failureRedirect: '/login' }),
+  function(req, res) {
+    // Successful authentication, redirect home. 
+    res.redirect('/github');
+  });
 
 
 // catch 404 and forward to error handler
@@ -75,6 +97,9 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
+
 
 // error handlers
 
@@ -91,12 +116,15 @@ if (app.get('env') === 'development') {
 }
 
 process.on('uncaughtException',function(err){
-  if(err)
+  if(err){
+    console.log('------err----')
     console.log(err)
+  }
 })
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+  console.log(err.status);
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
@@ -106,3 +134,5 @@ app.use(function(err, req, res, next) {
 
 
 module.exports = app;
+
+

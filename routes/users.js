@@ -8,7 +8,7 @@ var isAuthenticated = function (req,res,next) {
 
 /* GET users listing. */
 router.get('/', isAuthenticated, function(req, res, next) {
-	var html = "<h2>Hi, " + req.user.username + "</h2><a href='/logout'>LogOut Now</a>";
+	var html = "<h2>Hi, " + req.user.username + "</h2><p><a href='/logout'>LogOut Now</a></p><p><a href='/github'>github page</a></p><p><a href='/'>Home page</a></p>";
 	res.send(html);
  	//res.send('respond with a resource');
 });
